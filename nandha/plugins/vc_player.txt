@@ -1,0 +1,308 @@
+import uuid
+import time
+import os
+import logging
+import asyncio
+import config
+
+from nandha import user_client, userbot, pbot, LOGGER
+from pyrogram import filters, types, errors
+from moviepy import VideoFileClip
+from pytgcalls.types import MediaStream
+from pytgcalls.exceptions import *
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+userbot_id = 6280875871
+
+__module__ = "vc-player"
+
+
+
+
+
+__help__ = """
+*Voice Chat Player Assistant Commands*:
+
+• `/play`: Play audio/video in voice chat
+  - Reply to a media file (audio/video/document)
+  - Requires admin with video chat management rights
+
+• `/skip`: Skip current playback
+  - Leaves the current voice chat call
+  - Requires admin with video chat management rights
+
+• `/vcend`: End voice chat completely
+  - Terminates the voice chat and makes the bot leave the group
+  - Requires admin with video chat management rights
+
+*Usage Notes*:
+- Ensure bot and assistant have admin rights
+- Supports MP3, MP4, and MKV file formats
+- Maximum file size depends on Telegram's limitations
+
+*Troubleshooting*:
+- If you encounter issues, use /support to contact assistance
+"""
+
+SUPPORTED_MIME_TYPES = {
+    'video/x-matroska': '.mkv',
+    'video/mp4': '.mp4', 
+    'audio/mpeg': '.mp3'
+}
+
+
+
+
+
+async def auto_leave_call(app, chat_id, duration):
+    async def leave_call(app, chat_id, sleep_time):
+        await asyncio.sleep(sleep_time)
+        try:
+            await app.leave_call(chat_id)
+            LOGGER.info(f'✅ Leaves call from {chat_id}')
+        except Exception as e:
+            LOGGER.error(f'❌ ERROR when leaving call: {e}')
+    
+    asyncio.create_task(leave_call(app, chat_id, duration))
+
+
+
+
+async def get_duration(path: str):
+    try:
+       video = VideoFileClip(path)
+       duration = video.duration
+       return int(duration)
+    except Exception as e:
+       return 0
+    
+def is_valid_type(mime_type):
+    """Check if the file mime type is supported for playback."""
+    return mime_type in SUPPORTED_MIME_TYPES
+
+def generate_file_name(mime_type):
+    """Generate a unique filename based on mime type."""
+    extension = SUPPORTED_MIME_TYPES.get(mime_type, '.tmp')
+    return f"{uuid.uuid4()}{extension}"
+
+async def download_media(message, msg):
+    """
+    Download media with progress tracking.
+    
+    Args:
+        message: Pyrogram message object
+        msg: Progress update message
+    
+    Returns:
+        str: Path to downloaded file
+    """
+    r = message.reply_to_message
+    file_size = r.document.file_size if r.document else r.video.file_size if r.video else r.audio.file_size
+    file_name = generate_file_name(r.document.mime_type if r.document else r.video.mime_type if r.video else r.audio.mime_type)
+
+    start_time = time.perf_counter()
+    last_update_time = start_time
+    mb = 1024 * 1024  # 1 MB = 1024 * 1024 bytes
+
+    try:
+        with open(file_name, "wb+") as file:
+            download_size = 0
+            async for chunk in pbot.stream_media(r):
+                file.write(chunk)
+                download_size += len(chunk)
+
+                current_time = time.perf_counter()
+                progress = (download_size / file_size) * 100
+
+                # Update progress every 6 seconds
+                if current_time - last_update_time >= 6:
+                    try:
+                        await msg.edit_text(
+                            f"⬇️ **Downloading: {progress:.2f}% "
+                            f"({download_size/mb:.2f} MB / {file_size/mb:.2f} MB)**"
+                        )
+                        last_update_time = current_time
+                    except Exception:
+                        pass  # Continue download even if edit fails
+
+        return file_name
+    except Exception as e:
+        logger.error(f"Download failed: {e}")
+        await msg.edit_text(f"❌ **Download Error**: {str(e)}")
+        return None
+
+@pbot.on_message(filters.command('skip') & ~filters.forwarded & filters.group)
+async def skip_player(_, message):
+    """Skip current voice chat playback."""
+    m = message
+    user = m.from_user
+
+    member = await m.chat.get_member(user.id)
+    if not (member.privileges and member.privileges.can_manage_video_chats):
+        return await m.reply('**❌ Insufficient Permissions: Requires admin with video chat management rights.**')
+
+    try:
+        await userbot.leave_call(m.chat.username or m.chat.id)
+        await m.reply('✅ **Successfully skipped current playback.**')
+    except NotInCallError:
+        return await m.reply('**ℹ️ No active voice chat to skip.**')
+    except NoActiveGroupCall:
+        return await m.reply('**❌ No group call is currently active.**')
+    except Exception as e:
+        logger.error(f"Skip player error: {e}")
+        return await m.reply(f'❌ **Unexpected Error**: `{str(e)}`')
+
+@pbot.on_message(filters.command('vcend') & ~filters.forwarded & filters.group)
+async def endPlayer(_, message):
+    """Completely end voice chat and leave group."""
+    m = message
+    user = m.from_user
+
+    member = await m.chat.get_member(user.id)
+    if not (member.privileges and member.privileges.can_manage_video_chats):
+        return await m.reply('**❌ Insufficient Permissions: Requires admin with video chat management rights.**')
+
+    try:
+        await userbot.leave_call(m.chat.id)
+        
+        msg = await user_client.send_message(
+            m.chat.id, 
+            text=f'**✨ Voice Chat Ended: {m.chat.title} (ID: `{m.chat.id}`)**'
+        )
+        
+        # Log to channel
+        await _.copy_message(config.LOGS_CHANNEL, m.chat.id, msg.id)
+        
+        # Leave the chat
+        await user_client.leave_chat(m.chat.id)
+    except NotInCallError:
+        return await m.reply('**ℹ️ No active voice chat to end.**')
+    except NoActiveGroupCall:
+        return await m.reply('**❌ No group call is currently active.**')
+    except Exception as e:
+        logger.error(f"End player error: {e}")
+        return await m.reply(f'❌ **Unexpected Error**: `{str(e)}`')
+
+
+####################################################################################################
+
+async def format_duration(seconds):
+    """Format seconds into HH:MM:SS"""
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    return f"{minutes:02d}:{seconds:02d}"
+
+async def update_progress(msg, start_time, total_duration):
+    """Update progress message periodically"""
+    try:
+        while True:
+            elapsed_time = int(time.time() - start_time)
+            if elapsed_time >= total_duration:
+                await msg.edit_text("✅ **Playback completed!**")
+                break
+                
+            progress = (elapsed_time / total_duration) * 100
+            progress_bar = "".join(
+                "█" if i <= progress / 5 else "▒"
+                for i in range(20)
+            )
+            
+            current_time = await format_duration(elapsed_time)
+            total_time = await format_duration(total_duration)
+            
+            await msg.edit_text(
+                f"🎵 **Now Playing**\n\n"
+                f"⏳ Progress: {progress:.1f}%\n"
+                f"{progress_bar}\n"
+                f"⏱ {current_time} / {total_time}"
+            )
+            
+            await asyncio.sleep(5)  # Update every 5 seconds
+            
+    except Exception as e:
+        logger.error(f"Progress update error: {e}")
+
+@pbot.on_message(filters.command('play') & ~filters.forwarded & filters.group)
+async def player(_, message):
+    """Play media in voice chat."""
+    m = message
+    r = m.reply_to_message
+    user = m.from_user
+
+    # Validate reply and media type
+    if not r or not (r.audio or r.video or r.document):
+        return await m.reply('❌ **Please reply to a valid audio, video, or document file.**')
+    
+    if r.document and not is_valid_type(r.document.mime_type):
+        return await m.reply('❌ **Unsupported file type. Please use MP3, MP4, or MKV.**')
+
+    # Check bot and assistant admin status
+    bot = await m.chat.get_member(_.me.id)
+    if not bot.privileges:
+        return await m.reply("**❌ Bot requires admin privileges.**")
+
+    try:
+        await user_client.join_chat(m.chat.username or m.chat.id)
+        ubot = await m.chat.get_member(userbot_id)
+    except errors.UserNotParticipant:
+        return await m.reply_text('**❌ Assistant not in chat. Please add the assistant first.**')
+                                
+#    if not (ubot.privileges and ubot.privileges.can_manage_video_chats):
+#        return await m.reply("**❌ Assistant requires video chat management rights.**")
+    
+    member = await m.chat.get_member(user.id)
+    if not (member.privileges and member.privileges.can_manage_video_chats):
+        return await m.reply('**❌ Insufficient Permissions: Requires admin with video chat management rights.**')        
+    
+    # Download media
+    msg = await m.reply_text("📩 **File Downloading ...**")
+    file_path = await download_media(message, msg)
+    
+    if not file_path:
+        return
+
+    try:
+        duration = await get_duration(file_path)
+        if duration < 10:
+            return await msg.edit('❌ Failed, File duration is too low can\'t be played!')
+          
+        else:    
+            await msg.edit("🎵 **CONNECTING TO VIDEO CHAT...**")
+            await userbot.play(m.chat.id, MediaStream(file_path))
+            
+            # Start progress tracking
+            start_time = time.time()
+            progress_msg = await msg.edit_text(
+                f'✨ **Now Playing in {m.chat.title}** (ID: `{m.chat.id}`)\n'
+                '**💡 Tip**: Use /skip to change track or /vcend to stop.'
+            )
+            
+            # Copy to logs channel
+            await _.copy_message(config.LOGS_CHANNEL, m.chat.id, progress_msg.id)
+            
+            # Create progress tracking task
+            asyncio.create_task(update_progress(progress_msg, start_time, duration))
+            
+            # Set up auto-leave
+            await auto_leave_call(userbot, m.chat.id, duration)
+      
+    except NoActiveGroupCall:
+        return await msg.edit('❌ **No active group call. Start a voice chat first.**')
+    except AlreadyJoinedError:
+        return await msg.edit('❌ **Already in a voice chat.**')
+    except Exception as e:
+        logger.error(f"Playback error: {e}")
+        return await msg.edit(f'❌ **Playback Error**: `{str(e)}`')
+    finally:
+        # Clean up downloaded file after playback ends
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+
+####################################################################################################

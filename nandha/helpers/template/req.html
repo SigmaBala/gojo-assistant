@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta property="og:image" content="https://www.flaticon.com/premium-icon/icons/svg/2626/2626281.svg" itemprop="thumbnailUrl">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gojo Assistant - streaming</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway|Delius|Poppins:400,600">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+                        url('https://raw.githubusercontent.com/NandhaxD/dumps/refs/heads/main/gojo/IMG_20250104_153217_794.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        header {
+            background: rgba(44, 62, 80, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle {
+            position: absolute;
+            left: 40px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        #file-name {
+            font-family: 'Delius', cursive;
+            font-size: 1.8rem;
+            margin: 0;
+            padding: 0 60px;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            flex: 1;
+            margin: 2.5rem auto;
+            width: 90%;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        .plyr {
+            border-radius: 15px;
+            overflow: hidden;
+            top: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .error-message {
+            display: none;
+            background: rgba(255, 82, 82, 0.9);
+            color: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 82, 82, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        footer {
+            background: rgba(44, 62, 80, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer a {
+            color: white;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            padding: 0.85rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .dark {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+                        url('https://raw.githubusercontent.com/NandhaxD/dumps/refs/heads/main/gojo/IMG_20250104_153217_794.jpg');
+        }
+
+        .dark .plyr {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                margin: 1rem auto;
+            }
+
+            .toggle {
+                left: 20px;
+                width: 40px;
+                height: 40px;
+            }
+
+            #file-name {
+                padding: 0 50px;
+                font-size: 1.4rem;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            footer a {
+                display: block;
+                margin: 0 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toggle" id="theme-toggle">🌙</div>
+        <div id="file-name">
+            Gojo Assistant - Streaming
+        </div>
+    </header>
+
+    <div hidden>Hidden content {file_name} {heading}</div>
+  
+    <div class="container">
+        <div id="error-message" class="error-message"></div>
+        <video id="player" playsinline controls>
+            <source src="{media_url}" type="video/mp4" />
+        </video>
+    </div>
+
+    <footer>
+        <a href="https://t.me/GojoAssistantBot?start" target="_blank" rel="noopener">Start Bot</a>
+        <a href="https://t.me/NandhaBots" target="_blank" rel="noopener">Telegram Channel</a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            try {
+                if (typeof Plyr === 'undefined') {
+                    throw new Error('Plyr library failed to load');
+                }
+
+                const controls = [
+                    'play-large', 'rewind', 'play', 'fast-forward', 
+                    'progress', 'current-time', 'duration', 'mute', 
+                    'volume', 'captions', 'settings', 'pip', 
+                    'airplay', 'download', 'fullscreen'
+                ];
+                
+                const player = new Plyr('#player', { controls });
+
+                const toggle = document.getElementById('theme-toggle');
+                const body = document.body;
+                let isDark = false;
+
+                toggle.addEventListener('click', () => {
+                    isDark = !isDark;
+                    body.classList.toggle('dark');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                });
+
+                player.on('error', (event) => {
+                    console.error('Playback error:', event);
+                    showError('Video playback error. Please try again later.');
+                });
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize video player. Please refresh the page.');
+            }
+        });
+
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,1 +1,296 @@
-...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta property="og:image" content="https://www.flaticon.com/premium-icon/icons/svg/2626/2626281.svg" itemprop="thumbnailUrl">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{heading}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Delius">
+    <style>
+        :root {
+            --primary: #2de2e6;
+            --secondary: #ff3864;
+            --dark: #261c2c;
+            --text: #f2f2f2;
+            --glitch-offset: 3px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.cyber {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(45deg, #261c2c, #3e2f5b);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body.cyber::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(45, 226, 230, 0.03) 1px, transparent 1px) 0 0 / 20px 20px,
+                linear-gradient(0deg, rgba(45, 226, 230, 0.03) 1px, transparent 1px) 0 0 / 20px 20px;
+            pointer-events: none;
+        }
+
+        header {
+            background: rgba(38, 28, 44, 0.9);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(45, 226, 230, 0.2);
+        }
+
+        .toogle {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            cursor: pointer;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            transition: 0.3s ease;
+        }
+
+        .toogle:hover {
+            background: var(--secondary);
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        #file-name.cyber {
+            font-family: 'Delius', cursive;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-shadow: 2px 2px 0px var(--secondary),
+                         -2px -2px 0px var(--secondary);
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .cybr-btn {
+            --shadow-primary: rgba(45, 226, 230, 0.3);
+            --shadow-secondary: rgba(255, 56, 100, 0.3);
+            --border: 4px;
+            --shimmy-distance: 5;
+            --clip-one: polygon(0 2%, 100% 2%, 100% 95%, 95% 95%, 95% 90%, 85% 90%, 85% 95%, 8% 95%, 0 70%);
+            --clip-two: polygon(0 78%, 100% 78%, 100% 100%, 95% 100%, 95% 90%, 85% 90%, 85% 100%, 8% 100%, 0 78%);
+            --clip-three: polygon(0 44%, 100% 44%, 100% 54%, 95% 54%, 95% 54%, 85% 54%, 85% 54%, 8% 54%, 0 54%);
+            --clip-four: polygon(0 0, 100% 0, 100% 0, 95% 0, 95% 0, 85% 0, 85% 0, 8% 0, 0 0);
+            --clip-five: polygon(0 0, 100% 0, 100% 0, 95% 0, 95% 0, 85% 0, 85% 0, 8% 0, 0 0);
+            --clip-six: polygon(0 40%, 100% 40%, 100% 85%, 95% 85%, 95% 85%, 85% 85%, 85% 85%, 8% 85%, 0 70%);
+            --clip-seven: polygon(0 63%, 100% 63%, 100% 80%, 95% 80%, 95% 80%, 85% 80%, 85% 80%, 8% 80%, 0 70%);
+            font-family: 'Raleway', sans-serif;
+            color: var(--text);
+            cursor: pointer;
+            background: transparent;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 1.5rem 4rem;
+            border: var(--border) solid var(--primary);
+            position: relative;
+            transition: 0.3s ease;
+        }
+
+        .cybr-btn:hover {
+            --primary: #ff3864;
+            --shadow-primary: rgba(255, 56, 100, 0.3);
+            transform: scale(1.05);
+        }
+
+        .cybr-btn::after,
+        .cybr-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            clip-path: var(--clip-one);
+            z-index: -1;
+        }
+
+        .cybr-btn::before {
+            background: var(--shadow-primary);
+            transform: translate(var(--border), var(--border));
+        }
+
+        .cybr-btn::after {
+            background: var(--primary);
+        }
+
+        .cybr-btn__glitch {
+            position: absolute;
+            top: calc(var(--border) * -1);
+            left: calc(var(--border) * -1);
+            right: calc(var(--border) * -1);
+            bottom: calc(var(--border) * -1);
+            background: var(--secondary);
+            text-shadow: 2px 2px var(--primary);
+            clip-path: var(--clip-two);
+            animation: glitch 2s infinite;
+            display: none;
+        }
+
+        .cybr-btn:hover .cybr-btn__glitch {
+            display: block;
+        }
+
+        .cybr-btn__tag {
+            position: absolute;
+            padding: 0.5rem;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            font-weight: normal;
+            bottom: -2rem;
+            right: -2rem;
+            background: var(--primary);
+            color: var(--dark);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 85%);
+        }
+
+        footer {
+            background: rgba(38, 28, 44, 0.9);
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(45, 226, 230, 0.2);
+        }
+
+        footer.dark {
+            background: rgba(20, 15, 23, 0.9);
+        }
+
+        #fork-text {
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        #tg-logo {
+            transition: 0.3s ease;
+        }
+
+        #tg-logo:hover {
+            transform: rotate(360deg) scale(1.2);
+        }
+
+        #octo {
+            fill: var(--primary);
+        }
+
+        @keyframes glitch {
+            0% { clip-path: var(--clip-one); }
+            2%, 8% { clip-path: var(--clip-two); transform: translate(calc(var(--shimmy-distance) * -1%), 0); }
+            6% { clip-path: var(--clip-two); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
+            9% { clip-path: var(--clip-two); transform: translate(0, 0); }
+            10% { clip-path: var(--clip-three); }
+            13% { clip-path: var(--clip-four); }
+            14%, 21% { clip-path: var(--clip-five); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
+            25% { clip-path: var(--clip-six); }
+            30% { clip-path: var(--clip-seven); }
+            45% { clip-path: var(--clip-one); }
+            100% { clip-path: var(--clip-one); }
+        }
+
+        body.dark {
+            background: linear-gradient(45deg, #140f17, #261c2c);
+        }
+
+        .dark #file-name {
+            color: var(--secondary);
+            text-shadow: 2px 2px 0px var(--primary),
+                         -2px -2px 0px var(--primary);
+        }
+
+        @media (max-width: 600px) {
+            #file-name.cyber {
+                font-size: 1.3rem;
+                padding: 0 30px;
+            }
+
+            .cybr-btn {
+                font-size: 1.2rem;
+                padding: 1.2rem 3rem;
+            }
+
+            .cybr-btn__tag {
+                font-size: 0.7rem;
+                bottom: -1.8rem;
+                right: -1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body class='cyber'>
+    <header>
+        <div class="toogle"></div>
+        <div id="file-name" class="cyber">
+            {file_name}
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="{media_url}">
+            <button class="cybr-btn">
+                Download
+                <span aria-hidden>_</span>
+                <span aria-hidden class="cybr-btn__glitch">_404 Error</span>
+                <span aria-hidden class="cybr-btn__tag">{file_size}</span>
+            </button>
+        </a>
+    </div>
+
+    <footer>
+        <span id="fork-text">Follow me on</span>
+        <span>
+            <a href="https://t.me/nandhabots" id='tg-logo'>
+                <svg  id='octo' xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+                    <path d="M25,2c12.703,0,23,10.297,23,23S37.703,48,25,48S2,37.703,2,25S12.297,2,25,2z M32.934,34.375	c0.423-1.298,2.405-14.234,2.65-16.783c0.074-0.772-0.17-1.285-0.648-1.514c-0.578-0.278-1.434-0.139-2.427,0.219	c-1.362,0.491-18.774,7.884-19.78,8.312c-0.954,0.405-1.856,0.847-1.856,1.487c0,0.45,0.267,0.703,1.003,0.966	c0.766,0.273,2.695,0.858,3.834,1.172c1.097,0.303,2.346,0.04,3.046-0.395c0.742-0.461,9.305-6.191,9.92-6.693	c0.614-0.502,1.104,0.141,0.602,0.644c-0.502,0.502-6.38,6.207-7.155,6.997c-0.941,0.959-0.273,1.953,0.358,2.351	c0.721,0.454,5.906,3.932,6.687,4.49c0.781,0.558,1.573,0.811,2.298,0.811C32.191,36.439,32.573,35.484,32.934,34.375z"></path>
+                </svg>
+            </a>
+        </span>
+    </footer>
+
+    <script>
+        const body = document.querySelector('body');
+        const title = document.querySelector('#file-name');
+        const footer = document.querySelector('footer');
+        const toogle = document.querySelector('.toogle');
+        toogle.onclick = () => {
+            body.classList.toggle('dark');
+            footer.classList.toggle('dark');
+            title.classList.toggle('dark');
+        }
+    </script>
+</body>
+</html>

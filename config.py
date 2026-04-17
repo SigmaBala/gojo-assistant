@@ -9,7 +9,7 @@ multi_clients, work_loads = {}, {}
 
 # necessary
 PREFIX = True
-TOKEN: str = os.getenv('TOKEN', '6913439784:AAFwzP6uBQrjW9fkFb1FaADqnQbDm0')
+TOKEN: str = os.getenv('TOKEN', '')
 DB_URL: str = os.getenv('DB_URL', 'mongodb+srv://nandhaxd:hIahsjjPX3@cluster0.80igexg.mongodb.net')
 DB_URL2: str = os.getenv('DB_URL2', 'mongodb+srv://nandhasigma:vnfVompdkskskkssE3AK@cluster0.gt47zau.mongodb.net')
 BOT_ID: int = int(TOKEN.split(':')[0])
@@ -19,12 +19,12 @@ API_HASH: str = "d8ea642aedb7bc05f0cfd477"
 SUPPORT_CHAT = '@GojoAssistantChat'
 UPDATE_CHANNEL = '@NandhaBots'
 LOGS_CHANNEL =  5696053228 #'@GojoAssistant'
-BOT_USERNAME = '@GojoAssistantBot'
+BOT_USERNAME = '@Gojo_AssistantBot'
 BOT_NAME = "Gojo Saturo"
 IS_WEB_SUP = True
 
 DEV_LIST = [
-  5696053228, # t.me/nandha
+  5696053228, 1666544436 # t.me/nandha
 ]
 
 SPAM_USERS = {}
@@ -40,13 +40,6 @@ USER_STRING = "BQHCct8AOtz22BEAvc5FGHs7h-wblZmtZRHTVIiZHjFUJXoAde1QlomW8k848q2OA
 #gist
 GIST_TOKEN = "github_pat_11AVKME9WCXomC73WuVYtOnQdOxG08cfzcfDQ5NZEF2M3HHJYFmNI"
 
-
-# keep alive ( web support )
-WEB_URL = "https://makima-lover.onrender.com/"
-KEEP_ALIVE = True
-PORT = int(os.environ.get("PORT", 8080))
-BIND_ADDRESS = str(os.environ.get("WEB_SERVER_BIND_ADDRESS", "0.0.0.0"))
-WEB_SLEEP = 4*60
 
 # pagination & stuffs
 AUTO_DEL = 10

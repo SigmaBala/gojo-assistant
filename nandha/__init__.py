@@ -16,16 +16,6 @@ import random
 import pyrogram
 
 
-# MONKEY-BATCH
-DC_5 = ["91.108.56.137", "91.108.56.200", "91.108.56.150"]
-pyrogram.session.internals.data_center.DataCenter.PROD_MEDIA = {
-        2: "149.154.167.151",
-        4: "149.154.164.250",
-        5: random.choice(DC_5)
-}
-
-
-
 LOGGER = logging.getLogger(__name__)
 START_TIME = time.perf_counter()
 

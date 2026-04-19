@@ -1,8 +1,8 @@
 
 
-from nandha import MODULE
 
-import os, importlib
+
+import os, importlib, config
 
 
 
@@ -16,7 +16,7 @@ def import_plugins_from_directory(directory):
 
             # Check if the module has a '__module__' and '__help__' variable
             if hasattr(module, '__module__') and hasattr(module, '__help__'):
-                MODULE[module.__module__.lower()] = module.__help__
+                config.MODULE[module.__module__.lower()] = module.__help__
 
 
 

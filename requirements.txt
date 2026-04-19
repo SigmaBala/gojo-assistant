@@ -3,11 +3,11 @@
 #py-tgcalls==2.0.6
 
 tgcrypto==1.2.5
-pyrofork==2.3.68
-python-telegram-bot==22.0
+kurigram
+python-telegram-bot==22.5
 
 #addtional
-aiohttp==3.9.5
+aiohttp
 bs4==0.0.2
 pillow==10.3.0
 telegraph[aio]
